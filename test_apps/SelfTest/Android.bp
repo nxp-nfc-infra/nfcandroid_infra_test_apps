@@ -34,9 +34,13 @@
  ******************************************************************************/
 
 cc_test {
-    name: "RfSwitchCTSsignalConfig_NfcV1_2",
+    name: "SelfTest_Util_V1_0",
     defaults: ["VtsHalTargetTestDefaults"],
-    srcs: ["RfSwitchCTSsignalConfig_NfcV1_2.cpp"],
+    srcs: [ "main.cpp",
+            "NxpNfc_RfSwitch.cpp",
+            "NxpNfc_PRBS.cpp",
+            "NxpNfc_CTS.cpp",
+            "NxpNfc_EEPROMConfig.cpp"],
     static_libs: [
         "android.hardware.nfc@1.2",
         "android.hardware.nfc@1.1",

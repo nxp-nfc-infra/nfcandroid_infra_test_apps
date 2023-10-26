@@ -23,6 +23,7 @@
 int main(int argc, char *argv[]) {
   char insmod_str[56] =
       "insmod /vendor/lib/modules/nxpnfc_i2c.ko i2c_sw_param=";
+  int ret = 0;
   if (argc == 3 && strlen(argv[2]) == 1) {
     strcat(insmod_str, argv[2]);
     system("service call nfc 7");
@@ -31,11 +32,15 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[2], "0") == 0) {
       puts("Remove j55 jumper and press any key to continue");
     }
-    getchar();
+    ret = getchar();
+    if (ret < 0) {
+      puts("Failed to switch interface. Please try again");    
+      return ret;
+    }
     system("rmmod nxpnfc_i2c.ko");
     system(insmod_str);
     system("service call nfc 8");
-    return 0;
+    return ret;
   } else {
     puts("Wrong arguments");
     puts(
