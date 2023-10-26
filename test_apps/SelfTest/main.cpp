@@ -16,7 +16,7 @@
 
  /******************************************************************************
  *
- *  Copyright 2022 NXP
+ *  Copyright 2022-2023 NXP
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -33,7 +33,8 @@
  ******************************************************************************/
 #define LOG_TAG "nfc_hidl_hal_test"
 #include "common.h"
-
+#include <iostream>
+#include <stdexcept>
 
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(NfcSelfTestTest);
 INSTANTIATE_TEST_SUITE_P(
@@ -42,14 +43,18 @@ INSTANTIATE_TEST_SUITE_P(
         android::hardware::PrintInstanceNameToString);
 
 int main(int argc, char** argv) {
+  try {
     ::testing::InitGoogleTest(&argc, argv);
-
     std::system("svc nfc disable"); /* Turn off NFC */
     sleep(2);
     int status = RUN_ALL_TESTS();
     LOG(INFO) << "Test result = " << status;
     std::system("svc nfc enable"); /* Turn on NFC */
     sleep(2);
-
     return status;
+  } catch (const std::length_error &e) {
+    return 1; // Exit with an error code
+  } catch (const std::exception &e) {
+    return 1; // Exit with an error code
+  }
 }

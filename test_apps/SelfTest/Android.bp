@@ -50,4 +50,7 @@ cc_test {
     include_dirs: [
         "hardware/nxp/nfc/snxxx/extns/impl",
     ],
+    cflags: [
+        "-fexceptions", // Enable C++ exception handling
+    ],
 }
