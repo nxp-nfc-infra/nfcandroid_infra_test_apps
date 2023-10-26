@@ -1,0 +1,16 @@
+cc_binary {
+    name: "load_unload",
+    
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",],
+     srcs: [
+        "load_unload.c",
+     ],
+      shared_libs: [
+         "libbase",
+        "libcutils",
+        "libc",
+      ],
+}
