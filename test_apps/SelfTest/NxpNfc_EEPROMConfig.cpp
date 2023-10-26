@@ -235,7 +235,6 @@ static uint8_t no_of_92_valid_ele = sizeof(valid_92_eeprom_data[0])/sizeof(valid
  * phNci_Write_ReadEE_Test
  * Sends CORE_RESET_CMD_CONFIG_RESET,
  *       CORE_INIT_CMD_NCI20,
- *       NCI_NFCC_CONFIG_CONTROL_CMD,
  *       NCI_GET_EPROM_91_DATA_CMD,
  *       NCI_SET_INVALID_EMPROM_DATA_CMD_01,
  *       NCI_GET_EPROM_91_DATA_CMD,
@@ -248,7 +247,6 @@ TEST_P(NfcSelfTestTest, phNci_Write_ReadEE_Test) {
 
   std::vector<uint8_t> core_reset_cmd = CORE_RESET_CMD_CONFIG_RESET;
   std::vector<uint8_t> core_init_cmd = CORE_INIT_CMD_NCI20;
-  std::vector<uint8_t> set_config_cmd = NCI_NFCC_CONFIG_CONTROL_CMD;
   std::vector<uint8_t> get_eprom_data_cmd = NCI_GET_EPROM_91_DATA_CMD;
 
   // CORE_RESET_CMD
@@ -275,15 +273,6 @@ TEST_P(NfcSelfTestTest, phNci_Write_ReadEE_Test) {
   EXPECT_TRUE(res.no_timeout);
   EXPECT_LE(4ul, res.args->last_data_.size());
   EXPECT_EQ((int)(res.args->last_data_.size() - 3), res.args->last_data_[2]);
-  EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
-
-  // NCI_NFCC_CONFIG_CONTROL_CMD
-  NfcData data2 = set_config_cmd;
-  EXPECT_EQ(data2.size(), nfc_->write(data2));
-  // Wait for NCI_NFCC_CONFIG_CONTROL_RSP
-  res = nfc_cb_->WaitForCallback(kCallbackNameSendData);
-  EXPECT_TRUE(res.no_timeout);
-  EXPECT_EQ(5ul, res.args->last_data_.size());
   EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
 
   // NCI_GET_EPROM_91_DATA_CMD
@@ -384,7 +373,6 @@ TEST_P(NfcSelfTestTest, phNci_Write_ReadEE_Test) {
  * phNci_Write_ReadEE_Test2
  * Sends CORE_RESET_CMD_CONFIG_RESET,
  *       CORE_INIT_CMD_NCI20,
- *       NCI_NFCC_CONFIG_CONTROL_CMD,
  *       NCI_GET_EPROM_92_DATA_CMD
  *       NCI_SET_INVALID_92_EMPROM_DATA_CMD_01,
  *       NCI_GET_EPROM_92_DATA_CMD,
@@ -396,7 +384,6 @@ TEST_P(NfcSelfTestTest, phNci_Write_ReadEE_Test2) {
   LOG(INFO) << "Enter phNci_Write_ReadEE_Test2 :: SetGetProtocol_P004";
   std::vector<uint8_t> core_reset_cmd = CORE_RESET_CMD_CONFIG_RESET;
   std::vector<uint8_t> core_init_cmd = CORE_INIT_CMD_NCI20;
-  std::vector<uint8_t> set_config_cmd = NCI_NFCC_CONFIG_CONTROL_CMD;
   std::vector<uint8_t> get_eprom_data_cmd = NCI_GET_EPROM_92_DATA_CMD;
 
   // CORE_RESET_CMD
@@ -423,15 +410,6 @@ TEST_P(NfcSelfTestTest, phNci_Write_ReadEE_Test2) {
   EXPECT_TRUE(res.no_timeout);
   EXPECT_LE(4ul, res.args->last_data_.size());
   EXPECT_EQ((int)(res.args->last_data_.size() - 3), res.args->last_data_[2]);
-  EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
-
-  // NCI_NFCC_CONFIG_CONTROL_CMD
-  NfcData data2 = set_config_cmd;
-  EXPECT_EQ(data2.size(), nfc_->write(data2));
-  // Wait for NCI_NFCC_CONFIG_CONTROL_RSP
-  res = nfc_cb_->WaitForCallback(kCallbackNameSendData);
-  EXPECT_TRUE(res.no_timeout);
-  EXPECT_EQ(5ul, res.args->last_data_.size());
   EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
 
   // NCI_GET_EPROM_92_DATA_CMD

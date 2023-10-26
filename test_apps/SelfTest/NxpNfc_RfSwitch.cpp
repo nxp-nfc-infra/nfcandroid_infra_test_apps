@@ -42,7 +42,6 @@
  * phNci_SwitchRf_Field_Test1: Validate the RF Field Switch.
  * Sends CORE_RESET_CMD_CONFIG_RESET,
  *       CORE_INIT_CMD_NCI20,
- *       NCI_NFCC_CONFIG_CONTROL_CMD,
  *       NCI_SWITCH_RF_FIELD_CMD_1,
  *       NCI_SWITCH_RF_FIELD_CMD_2,
  *       NCI_SWITCH_RF_FIELD_CMD_3
@@ -53,7 +52,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test1) {
   LOG(INFO) << "Enter phNci_SwitchRf_Field_Test :: SwitchRF_P001";
   std::vector<uint8_t> core_reset_cmd = CORE_RESET_CMD_CONFIG_RESET;
   std::vector<uint8_t> core_init_cmd = CORE_INIT_CMD_NCI20;
-  std::vector<uint8_t> set_config_cmd = NCI_NFCC_CONFIG_CONTROL_CMD;
   std::vector<uint8_t> nci_switch_rf_field_cmd_1 = NCI_SWITCH_RF_FIELD_CMD_1;
   std::vector<uint8_t> nci_switch_rf_field_cmd_2 = NCI_SWITCH_RF_FIELD_CMD_2;
   std::vector<uint8_t> nci_switch_rf_field_cmd_3 = NCI_SWITCH_RF_FIELD_CMD_3;
@@ -82,15 +80,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test1) {
   EXPECT_TRUE(res.no_timeout);
   EXPECT_LE(4ul, res.args->last_data_.size());
   EXPECT_EQ((int)(res.args->last_data_.size()-3), res.args->last_data_[2]);
-  EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
-
-  //NCI_NFCC_CONFIG_CONTROL_CMD
-  NfcData data2 = set_config_cmd;
-  EXPECT_EQ(data2.size(), nfc_->write(data2));
-  // Wait for NCI_NFCC_CONFIG_CONTROL_RSP
-  res = nfc_cb_->WaitForCallback(kCallbackNameSendData);
-  EXPECT_TRUE(res.no_timeout);
-  EXPECT_EQ(5ul, res.args->last_data_.size());
   EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
 
   //NCI_SWITCH_RF_FIELD_CMD_1
@@ -143,7 +132,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test1) {
  * phNci_SwitchRf_Field_Test2: Validate the RF Field Switch.
  * Sends CORE_RESET_CMD,
  *       CORE_INIT_CMD_NCI20,
- *       NCI_NFCC_CONFIG_CONTROL_CMD,
  *       NCI_SWITCH_RF_FIELD_CMD_1,
  *       NCI_SWITCH_RF_FIELD_CMD_4,
  *       NCI_SWITCH_RF_FIELD_CMD_3
@@ -154,7 +142,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test2) {
   LOG(INFO) << "Enter phNci_SwitchRf_Field_Test :: SwitchRF_P002";
   std::vector<uint8_t> core_reset_cmd = CORE_RESET_CMD_CONFIG_RESET;
   std::vector<uint8_t> core_init_cmd = CORE_INIT_CMD_NCI20;
-  std::vector<uint8_t> set_config_cmd = NCI_NFCC_CONFIG_CONTROL_CMD;
   std::vector<uint8_t> nci_switch_rf_field_cmd_1 = NCI_SWITCH_RF_FIELD_CMD_1;
   std::vector<uint8_t> nci_switch_rf_field_cmd_4 = NCI_SWITCH_RF_FIELD_CMD_4;
   std::vector<uint8_t> nci_switch_rf_field_cmd_3 = NCI_SWITCH_RF_FIELD_CMD_3;
@@ -183,15 +170,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test2) {
   EXPECT_TRUE(res.no_timeout);
   EXPECT_LE(4ul, res.args->last_data_.size());
   EXPECT_EQ((int)(res.args->last_data_.size()-3), res.args->last_data_[2]);
-  EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
-
-  //NCI_NFCC_CONFIG_CONTROL_CMD
-  NfcData data2 = set_config_cmd;
-  EXPECT_EQ(data2.size(), nfc_->write(data2));
-  // Wait for NCI_NFCC_CONFIG_CONTROL_RSP
-  res = nfc_cb_->WaitForCallback(kCallbackNameSendData);
-  EXPECT_TRUE(res.no_timeout);
-  EXPECT_EQ(5ul, res.args->last_data_.size());
   EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
 
   //NCI_SWITCH_RF_FIELD_CMD_1
@@ -245,7 +223,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test2) {
  * phNci_SwitchRf_Field_Test3: Validate the RF Field Switch.
  * Sends CORE_RESET_CMD_CONFIG_RESET,
  *       CORE_INIT_CMD_NCI20,
- *       NCI_NFCC_CONFIG_CONTROL_CMD,
  *       NCI_SWITCH_RF_FIELD_CMD_1,
  *       NCI_SWITCH_RF_FIELD_CMD_5
  * Waits for respective Response and Notifications. Validate the same.
@@ -255,7 +232,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test3) {
   LOG(INFO) << "Enter phNci_SwitchRf_Field_Test :: SwitchRF_P003  ";
   std::vector<uint8_t> core_reset_cmd = CORE_RESET_CMD_CONFIG_RESET;
   std::vector<uint8_t> core_init_cmd = CORE_INIT_CMD_NCI20;
-  std::vector<uint8_t> set_config_cmd = NCI_NFCC_CONFIG_CONTROL_CMD;
   std::vector<uint8_t> nci_switch_rf_field_cmd_1 = NCI_SWITCH_RF_FIELD_CMD_1;
   std::vector<uint8_t> nci_switch_rf_field_cmd_5 = NCI_SWITCH_RF_FIELD_CMD_5;
 
@@ -283,16 +259,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test3) {
   EXPECT_TRUE(res.no_timeout);
   EXPECT_LE(4ul, res.args->last_data_.size());
   EXPECT_EQ((int)(res.args->last_data_.size()-3), res.args->last_data_[2]);
-  EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
-
-
-  //NCI_NFCC_CONFIG_CONTROL_CMD
-  NfcData data2 = set_config_cmd;
-  EXPECT_EQ(data2.size(), nfc_->write(data2));
-  // Wait for NCI_NFCC_CONFIG_CONTROL_RSP
-  res = nfc_cb_->WaitForCallback(kCallbackNameSendData);
-  EXPECT_TRUE(res.no_timeout);
-  EXPECT_EQ(5ul, res.args->last_data_.size());
   EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
 
   //NCI_SWITCH_RF_FIELD_CMD_1
@@ -332,7 +298,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test3) {
  * phNci_SwitchRf_Field_Test4: Validate the RF Field Switch.
  * Sends CORE_RESET_CMD_CONFIG_RESET,
  *       CORE_INIT_CMD_NCI20,
- *       NCI_NFCC_CONFIG_CONTROL_CMD,
  *       NCI_SWITCH_RF_FIELD_CMD_1,
  *       NCI_SWITCH_RF_FIELD_CMD_2,
  *       NCI_SWITCH_RF_FIELD_CMD_3
@@ -343,7 +308,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test4) {
   LOG(INFO) << "Enter phNci_SwitchRf_Field_Test :: SwitchRF_P004";
   std::vector<uint8_t> core_reset_cmd = CORE_RESET_CMD_CONFIG_RESET;
   std::vector<uint8_t> core_init_cmd = CORE_INIT_CMD_NCI20;
-  std::vector<uint8_t> set_config_cmd = NCI_NFCC_CONFIG_CONTROL_CMD;
   std::vector<uint8_t> nci_switch_rf_field_cmd_1 = NCI_SWITCH_RF_FIELD_CMD_1;
   std::vector<uint8_t> nci_switch_rf_field_cmd_6 = NCI_SWITCH_RF_FIELD_CMD_6;
   std::vector<uint8_t> nci_switch_rf_field_cmd_3 = NCI_SWITCH_RF_FIELD_CMD_3;
@@ -372,15 +336,6 @@ TEST_P(NfcSelfTestTest, phNci_SwitchRf_Field_Test4) {
   EXPECT_TRUE(res.no_timeout);
   EXPECT_LE(4ul, res.args->last_data_.size());
   EXPECT_EQ((int)(res.args->last_data_.size()-3), res.args->last_data_[2]);
-  EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
-
-  //NCI_NFCC_CONFIG_CONTROL_CMD
-  NfcData data2 = set_config_cmd;
-  EXPECT_EQ(data2.size(), nfc_->write(data2));
-  // Wait for NCI_NFCC_CONFIG_CONTROL_RSP
-  res = nfc_cb_->WaitForCallback(kCallbackNameSendData);
-  EXPECT_TRUE(res.no_timeout);
-  EXPECT_EQ(5ul, res.args->last_data_.size());
   EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
 
   //NCI_SWITCH_RF_FIELD_CMD_1

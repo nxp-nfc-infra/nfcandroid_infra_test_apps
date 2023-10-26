@@ -42,7 +42,6 @@
  * phNci_Cts_Test1: Validate the CTS Signal Configuration
  * Sends CORE_RESET_CMD_CONFIG_RESET,
  *       CORE_INIT_CMD_NCI20,
- *       NCI_NFCC_CONFIG_CONTROL_CMD,
  *       NCI_CTS_TEST_CMD_1,
  *       NCI_CTS_TEST_CMD_2,
  *       NCI_DISCOVERY_CMD,
@@ -54,7 +53,6 @@ TEST_P(NfcSelfTestTest, phNci_Cts_Test1) {
   LOG(INFO) << "Enter phNci_Cts_Test1 :: Cts_P001";
   std::vector<uint8_t> core_reset_cmd = CORE_RESET_CMD_CONFIG_RESET;
   std::vector<uint8_t> core_init_cmd = CORE_INIT_CMD_NCI20;
-  std::vector<uint8_t> set_config_cmd = NCI_NFCC_CONFIG_CONTROL_CMD;
   std::vector<uint8_t> nci_cts_test_cmd_1 = NCI_CTS_TEST_CMD_1;
   std::vector<uint8_t> nci_cts_test_cmd_2 = NCI_CTS_TEST_CMD_2;
   std::vector<uint8_t> nci_discovery_cmd = NCI_DISCOVERY_CMD;
@@ -84,15 +82,6 @@ TEST_P(NfcSelfTestTest, phNci_Cts_Test1) {
   EXPECT_TRUE(res.no_timeout);
   EXPECT_LE(4ul, res.args->last_data_.size());
   EXPECT_EQ((int)(res.args->last_data_.size()-3), res.args->last_data_[2]);
-  EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
-
-  //NCI_NFCC_CONFIG_CONTROL_CMD
-  NfcData data2 = set_config_cmd;
-  EXPECT_EQ(data2.size(), nfc_->write(data2));
-  // Wait for NCI_NFCC_CONFIG_CONTROL_RSP
-  res = nfc_cb_->WaitForCallback(kCallbackNameSendData);
-  EXPECT_TRUE(res.no_timeout);
-  EXPECT_EQ(5ul, res.args->last_data_.size());
   EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
 
   //NCI_CTS_TEST_CMD_1
@@ -187,7 +176,6 @@ TEST_P(NfcSelfTestTest, phNci_Cts_Test1) {
  * phNci_Load_Protocol_Test
  * Sends CORE_RESET_CMD_CONFIG_RESET,
  *       CORE_INIT_CMD_NCI20,
- *       NCI_NFCC_CONFIG_CONTROL_CMD,
  *       NCI_LOAD_PROTOCOL_CMD_1,
  *       NCI_LOAD_PROTOCOL_SUB_CMD_1,
  *       NCI_LOAD_PROTOCOL_SUB_CMD_2
@@ -199,7 +187,6 @@ TEST_P(NfcSelfTestTest, phNci_Load_Protocol_Test1) {
   LOG(INFO) << "Enter phNci_Load_Protocol_Test :: LoadProtocol_P001";
   std::vector<uint8_t> core_reset_cmd = CORE_RESET_CMD_CONFIG_RESET;
   std::vector<uint8_t> core_init_cmd = CORE_INIT_CMD_NCI20;
-  std::vector<uint8_t> set_config_cmd = NCI_NFCC_CONFIG_CONTROL_CMD;
   std::vector<uint8_t> nci_load_protocol_cmd_1 = NCI_LOAD_PROTOCOL_CMD_1;
   std::vector<uint8_t> nci_load_protocol_cmd_2 = NCI_LOAD_PROTOCOL_CMD_2;
   std::vector<uint8_t> nci_load_protocol_cmd_3 = NCI_LOAD_PROTOCOL_CMD_3;
@@ -232,15 +219,6 @@ TEST_P(NfcSelfTestTest, phNci_Load_Protocol_Test1) {
   EXPECT_TRUE(res.no_timeout);
   EXPECT_LE(4ul, res.args->last_data_.size());
   EXPECT_EQ((int)(res.args->last_data_.size() - 3), res.args->last_data_[2]);
-  EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
-
-  // NCI_NFCC_CONFIG_CONTROL_CMD
-  NfcData data2 = set_config_cmd;
-  EXPECT_EQ(data2.size(), nfc_->write(data2));
-  // Wait for NCI_NFCC_CONFIG_CONTROL_RSP
-  res = nfc_cb_->WaitForCallback(kCallbackNameSendData);
-  EXPECT_TRUE(res.no_timeout);
-  EXPECT_EQ(5ul, res.args->last_data_.size());
   EXPECT_EQ((int)NfcStatus::OK, res.args->last_data_[3]);
 
   // NCI_LOAD_PROTOCOL_CMD_1
