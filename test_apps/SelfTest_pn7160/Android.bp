@@ -1,0 +1,14 @@
+cc_test {
+    name: "SelfTestHalNfcV1_2",
+    defaults: ["VtsHalTargetTestDefaults"],
+    srcs: ["SelfTestHalNfcV1_2TargetTest.cpp"],
+    static_libs: [
+        "android.hardware.nfc@1.2",
+        "android.hardware.nfc@1.1",
+        "android.hardware.nfc@1.0",
+        "vendor.nxp.nxpnfc@2.0"
+    ],
+    include_dirs: [
+        "hardware/nxp/nfc/pn72xx/extns/impl",
+    ],
+}

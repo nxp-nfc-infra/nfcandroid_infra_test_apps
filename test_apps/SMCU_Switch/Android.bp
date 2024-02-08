@@ -17,9 +17,9 @@
 
 //##########################################
 cc_test {
-    name: "SmcuSwitchV1_0",
+    name: "SmcuSwitchV2_0",
     defaults: ["VtsHalTargetTestDefaults"],
-    srcs: ["SmcuSwitchV1_0TargetTest.cpp"],
+    srcs: ["SmcuSwitchV2_0TargetTest.cpp"],
     static_libs: [
         "android.hardware.nfc@1.0",
         "android.hardware.nfc@1.1",
