@@ -11,5 +11,6 @@ android_app {
         "androidx.appcompat_appcompat",
         "com.google.android.material_material",
     ],
+    uses_libs: ["com.nxp.emvco"],
 }
 
