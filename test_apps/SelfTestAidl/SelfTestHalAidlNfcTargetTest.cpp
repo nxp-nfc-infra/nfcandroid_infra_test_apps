@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- *  Copyright 2024 NXP
+ *  Copyright 2024-2025 NXP
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <aidl/android/hardware/nfc/BnNfc.h>
 #include <aidl/android/hardware/nfc/BnNfcClientCallback.h>
 #include <aidl/android/hardware/nfc/INfc.h>
+#include <aidl/vendor/nxp/nxpnfc_aidl/BnNxpNfc.h>
 #include <android-base/logging.h>
 #include <android-base/stringprintf.h>
 #include <android/binder_auto_utils.h>
@@ -30,10 +31,6 @@
 #include <android/binder_manager.h>
 #include <android/binder_process.h>
 #include <gtest/gtest.h>
-#include <hardware/nfc.h>
-#include <hidl/GtestPrinter.h>
-#include <hidl/ServiceManagement.h>
-#include <vendor/nxp/nxpnfc/2.0/INxpNfc.h>
 
 #include <chrono>
 #include <future>
@@ -42,11 +39,7 @@
 #include <vector>
 
 using aidl::android::hardware::nfc::INfc;
-using ::vendor::nxp::nxpnfc::V2_0::INxpNfc;
-using ::android::sp;
-using ::android::hardware::hidl_vec;
-using ::android::hardware::Return;
-using ::android::hardware::Void;
+using ::aidl::vendor::nxp::nxpnfc_aidl::INxpNfc;
 using android::getAidlHalInstanceNames;
 using android::PrintInstanceNameToString;
 using android::base::StringPrintf;
@@ -58,6 +51,8 @@ using aidl::android::hardware::nfc::NfcStatus;
 
 std::mutex mtx;
 std::string NFC_AIDL_HAL_SERVICE_NAME = "android.hardware.nfc.INfc/default";
+std::string NXPNFC_AIDL_HAL_SERVICE_NAME =
+    "vendor.nxp.nxpnfc_aidl.INxpNfc/default";
 constexpr static int kCallbackTimeoutMs = 10000;
 
 /* NCI Commands */
@@ -143,16 +138,18 @@ class NfcSelfTestTest : public testing::TestWithParam<std::string> {
    * 0x11 for NCI 1.1, 0x20 for NCI 2.0 and so forth */
   uint8_t nci_version;
   std::shared_ptr<INfc> nfc_;
+  std::shared_ptr<INxpNfc> nxpnfc_;
 
   void SetUp() override {
-    ::ndk::SpAIBinder binder(
+    ::ndk::SpAIBinder nfcBinder(
         AServiceManager_waitForService(NFC_AIDL_HAL_SERVICE_NAME.c_str()));
-    nfc_ = INfc::fromBinder(binder);
+    nfc_ = INfc::fromBinder(nfcBinder);
     ASSERT_NE(nfc_, nullptr);
-    nxpnfc_ = INxpNfc::getService();
+    ::ndk::SpAIBinder nxpNfcBinder(
+      AServiceManager_waitForService(NXPNFC_AIDL_HAL_SERVICE_NAME.c_str()));
+    nxpnfc_ = INxpNfc::fromBinder(nxpNfcBinder);
     ASSERT_NE(nxpnfc_, nullptr);
   }
-    sp<INxpNfc> nxpnfc_;
 };
 
 /*********************************************************************
@@ -2402,10 +2399,11 @@ TEST_P(NfcSelfTestTest, Prbs_HW_PRBS15_B_424_SelfTest) {
 
 TEST_P(NfcSelfTestTest, INxpNfcApi_selfTest) {
 /*********************************SET_TRANSIT_CONFIG************************************/
+bool ret;
   //std::string transitconf = "This is dummy data\n";
   std::string transitconf;
-  auto res = nxpnfc_->setNxpTransitConfig(transitconf);
-  EXPECT_TRUE(res);
+  EXPECT_TRUE(nxpnfc_->setNxpTransitConfig(transitconf, &ret).isOk());
+  EXPECT_TRUE(ret);
   /*********************************NCI_TRANSCEIVE***************************************/
 }
 

@@ -16,7 +16,7 @@
 
  /******************************************************************************
  *
- *  Copyright 2023-2024 NXP
+ *  Copyright 2023-2025 NXP
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@
  *
  ******************************************************************************/
 #define LOG_TAG "SmcuSwitchV2_0"
-#include <android-base/logging.h>
 #include <iostream>
 #include <cutils/properties.h>
 #include <aidl/Gtest.h>
@@ -40,6 +39,8 @@
 #include <aidl/android/hardware/nfc/BnNfc.h>
 #include <aidl/android/hardware/nfc/BnNfcClientCallback.h>
 #include <aidl/android/hardware/nfc/INfc.h>
+#include <aidl/vendor/nxp/nxpnfc_aidl/BnNxpNfc.h>
+#include <android-base/logging.h>
 #include <android-base/stringprintf.h>
 #include <android/binder_auto_utils.h>
 #include <android/binder_enums.h>
@@ -47,14 +48,8 @@
 #include <android/binder_interface_utils.h>
 #include <android/binder_manager.h>
 #include <android/binder_process.h>
-#include <gtest/gtest.h>
-#include <hardware/nfc.h>
-#include <hidl/GtestPrinter.h>
-#include <hidl/ServiceManagement.h>
-#include <hardware/nfc.h>
-
 #include <string>//memcpy
-#include <vendor/nxp/nxpnfc/2.0/INxpNfc.h>
+
 
 #include <chrono>
 #include <future>
@@ -63,11 +58,7 @@
 #include <vector>
 
 using aidl::android::hardware::nfc::INfc;
-using ::vendor::nxp::nxpnfc::V2_0::INxpNfc;
-using ::android::sp;
-using ::android::hardware::hidl_vec;
-using ::android::hardware::Return;
-using ::android::hardware::Void;
+using ::aidl::vendor::nxp::nxpnfc_aidl::INxpNfc;
 using android::getAidlHalInstanceNames;
 using android::PrintInstanceNameToString;
 using android::base::StringPrintf;
@@ -79,11 +70,13 @@ using aidl::android::hardware::nfc::NfcStatus;
 
 std::mutex mtx;
 std::string NFC_AIDL_HAL_SERVICE_NAME = "android.hardware.nfc.INfc/default";
+std::string NXPNFC_AIDL_HAL_SERVICE_NAME =
+    "vendor.nxp.nxpnfc_aidl.INxpNfc/default";
 constexpr static int kCallbackTimeoutMs = 10000;
 
 /* NCI Commands */
 bool isFwDnldExit = false;
-static sp<INxpNfc> gp_nxpnfc_;
+static std::shared_ptr<INxpNfc> gp_nxpnfc_;
 static std::shared_ptr<INfc> gp_nfc_;
 
 
@@ -128,18 +121,18 @@ class NxpNfc_DualCpuTest : public testing::TestWithParam<std::string> {
   public:
     uint8_t nci_version;
     std::shared_ptr<INfc> nfc_;
+    std::shared_ptr<INxpNfc> nxpnfc_;
 
     /**
      * @brief  Listens for user interrupt and exits the application
      *
      **/
     static void signal_callback_handler(int signum) {
-      auto res = 0;
+      bool res;
       std::vector<std::promise<void>> send_cmd_cb_promise;
       cout << "SMCU test App abort requested, signum:" << signum << endl;
-      res = gp_nxpnfc_->setEseUpdateState(
-          (vendor::nxp::nxpnfc::V2_0::NxpNfcHalEseState)0x02);
-      EXPECT_TRUE(res);
+      EXPECT_TRUE(gp_nxpnfc_->switchMode(
+          (::aidl::vendor::nxp::nxpnfc_aidl::ModeType)0x02, &res).isOk());
       // Close and wait for CLOSE_CPLT
       LOG(INFO) << "close HOST_SWITCHED_OFF";
       EXPECT_TRUE(gp_nfc_->close(NfcCloseType::HOST_SWITCHED_OFF).isOk());
@@ -151,7 +144,6 @@ class NxpNfc_DualCpuTest : public testing::TestWithParam<std::string> {
 
     /* NCI version the device supports
      * 0x11 for NCI 1.1, 0x20 for NCI 2.0 and so forth */
-    sp<INxpNfc> nxpnfc_;
 };
 
 /*
@@ -161,7 +153,7 @@ class NxpNfc_DualCpuTest : public testing::TestWithParam<std::string> {
 TEST_F(NxpNfc_DualCpuTest, NxpNfc_DualCpu_modeSwitch) {
   LOG(INFO) << "Enter NxpNfc_DualCpu_modeSwitch";
   int userInput = 0;
-  auto res = 0;
+  bool res;
   int prevState = 2;
   signal(SIGINT, signal_callback_handler);  /* Handle Ctrl+C*/
   signal(SIGTSTP, signal_callback_handler); /* Handle Ctrl+Z*/
@@ -169,7 +161,9 @@ TEST_F(NxpNfc_DualCpuTest, NxpNfc_DualCpu_modeSwitch) {
           AServiceManager_waitForService(NFC_AIDL_HAL_SERVICE_NAME.c_str()));
       nfc_ = INfc::fromBinder(binder);
       ASSERT_NE(nfc_, nullptr);
-      nxpnfc_ = INxpNfc::getService();
+      ::ndk::SpAIBinder binder1(
+        AServiceManager_waitForService(NXPNFC_AIDL_HAL_SERVICE_NAME.c_str()));
+      nxpnfc_ = INxpNfc::fromBinder(binder1);
       ASSERT_NE(nxpnfc_, nullptr);
 
       std::vector<uint8_t> rsp_data;
@@ -207,7 +201,7 @@ TEST_F(NxpNfc_DualCpuTest, NxpNfc_DualCpu_modeSwitch) {
       isFwDnldExit = false;
       gp_nxpnfc_ = nxpnfc_;
       gp_nfc_ = nfc_;
-    
+
   while(1)
   {
     cout << "Select the option\n";
@@ -239,8 +233,8 @@ TEST_F(NxpNfc_DualCpuTest, NxpNfc_DualCpu_modeSwitch) {
     if(userInput == 0x03) {
       cout << " **** Switch to SMCU Host for FW DNLD. Wait for Download to be Completed **** \n" << endl;
     }
-    res = gp_nxpnfc_->setEseUpdateState((vendor::nxp::nxpnfc::V2_0::NxpNfcHalEseState)userInput);
-    EXPECT_TRUE(res);
+
+    EXPECT_TRUE( gp_nxpnfc_->switchMode((::aidl::vendor::nxp::nxpnfc_aidl::ModeType)userInput, &res).isOk());
 
   nfcModeExit:
     if(userInput == 0x02) {
@@ -262,7 +256,7 @@ TEST_F(NxpNfc_DualCpuTest, NxpNfc_DualCpu_modeSwitch) {
           LOG(INFO) << "not waiting for close";
           EXPECT_EQ(close_cb_future.wait_for(timeout), std::future_status::ready);
         }
-   
+
         std::system("svc nfc enable");
         isFwDnldExit = true;
       } else {

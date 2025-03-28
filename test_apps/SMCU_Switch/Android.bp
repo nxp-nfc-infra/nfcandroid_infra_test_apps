@@ -16,7 +16,7 @@
 
  /******************************************************************************
  *
- *  Copyright 2024 NXP
+ *  Copyright 2024-2025 NXP
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ cc_test {
     ],
     static_libs: [
         "android.hardware.nfc-V1-ndk",
-        "vendor.nxp.nxpnfc@2.0",
+        "vendor.nxp.nxpnfc_aidl-V2-ndk"
     ],
     include_dirs: [
         "hardware/nxp/nfc/pn72xx/extns/impl",
