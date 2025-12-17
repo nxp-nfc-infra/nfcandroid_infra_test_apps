@@ -128,7 +128,7 @@ class NxpNfc_DualCpuTest : public testing::TestWithParam<std::string> {
      *
      **/
     static void signal_callback_handler(int signum) {
-      bool res;
+      bool res=false;
       std::vector<std::promise<void>> send_cmd_cb_promise;
       cout << "SMCU test App abort requested, signum:" << signum << endl;
       EXPECT_TRUE(gp_nxpnfc_->switchMode(
@@ -153,7 +153,7 @@ class NxpNfc_DualCpuTest : public testing::TestWithParam<std::string> {
 TEST_F(NxpNfc_DualCpuTest, NxpNfc_DualCpu_modeSwitch) {
   LOG(INFO) << "Enter NxpNfc_DualCpu_modeSwitch";
   int userInput = 0;
-  bool res;
+  bool res=false;
   int prevState = 2;
   signal(SIGINT, signal_callback_handler);  /* Handle Ctrl+C*/
   signal(SIGTSTP, signal_callback_handler); /* Handle Ctrl+Z*/
@@ -234,7 +234,7 @@ TEST_F(NxpNfc_DualCpuTest, NxpNfc_DualCpu_modeSwitch) {
       cout << " **** Switch to SMCU Host for FW DNLD. Wait for Download to be Completed **** \n" << endl;
     }
 
-    EXPECT_TRUE( gp_nxpnfc_->switchMode((::aidl::vendor::nxp::nxpnfc_aidl::ModeType)userInput, &res).isOk());
+    EXPECT_TRUE(gp_nxpnfc_->switchMode((::aidl::vendor::nxp::nxpnfc_aidl::ModeType)userInput, &res).isOk());
 
   nfcModeExit:
     if(userInput == 0x02) {
