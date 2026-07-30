@@ -2,6 +2,7 @@ android_app {
     name: "EMVCoModeSwitchApp",
 
     platform_apis: true,
+    privileged: true,
     // Only compile source java files in this apk.
     srcs: ["src/**/*.java"],
 

@@ -33,6 +33,6 @@ cc_test {
          "vendor.nxp.nxpnfc_aidl-V2-ndk"
     ],
     include_dirs: [
-        "hardware/nxp/nfc/pn72xx/extns/impl",
+        "hardware/nxp/nfc/nfc_reader/extns/impl",
     ],
 }
